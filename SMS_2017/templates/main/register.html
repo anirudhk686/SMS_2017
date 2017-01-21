@@ -1,0 +1,37 @@
+<html>
+<head>
+	<title>registration page</title>
+</head>
+<body>
+	{%if registered%}
+	<br>
+	<center>REGISTRATION SUCESS</center>
+	<br>
+	<BOLD><center>TEAM NO:{{team_no}}</center></BOLD>
+     <br>
+	<BOLD><center>password:{{password}}</center></BOLD>
+
+
+	{%else%}
+	<h1><center>REGISTER HERE</center></h1>
+	<br>
+
+	<form id="Team_form" method="post" action="/main/register/">
+	{% csrf_token %}
+
+	<center>member1<input type="text" name="member1"/></center>
+	<br>
+	<center>member2<input type="text" name="member2"/></center>
+	<br>
+
+	<center><input type="submit" value="register"/></center>
+
+	{%endif%}
+	
+
+
+
+</form>
+</body>
+
+</html>

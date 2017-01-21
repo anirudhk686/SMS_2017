@@ -1,0 +1,18 @@
+
+
+
+
+from django import forms
+from main.models import *
+
+class Team_form(forms.ModelForm):
+
+	team_no = forms.IntegerField()
+	password = forms.IntegerField()
+	member1 = forms.CharField(help_text="enter mem1 id")
+	member2 = forms.CharField(help_text="enter mem2 id")
+
+	class Meta:
+		model=Team
+		fields=('team_no','password','member1','member2')
+		
