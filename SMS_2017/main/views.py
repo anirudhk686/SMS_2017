@@ -29,4 +29,20 @@ def BitsRegistrationView(request): #Registration for first degree bitsians
 	else:
 		form=BitsRegistrationForm()
 
+	return render_to_response('main/bitsregister.html',{'form':form})	
+
+def RegistrationView(request): #Registration for the rest
+
+	if request.method == 'POST':
+		form=RegistrationForm(request.POST)
+
+		if form.is_valid():
+			team=form.save(commit=False)
+			team.password=randint(101,999)
+			team.save()
+			form=RegistrationForm()
+		
+	else:
+		form=RegistrationForm()
+
 	return render_to_response('main/register.html',{'form':form})	
