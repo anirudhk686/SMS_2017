@@ -15,11 +15,8 @@ def BitsRegistrationView(request): #Registration for first degree bitsians
 
 			id1=form.cleaned_data['id1']
 
-			idRegex=re.compile(r'(\d\d)(\d\d\d)')
-
-			mo=idRegex.search(id1)
+			team.team_no=id1
 			
-			team.team_no=mo.group(2)
 			team.password=randint(101,999)
 			team.save()
 			form=BitsRegistrationForm()
