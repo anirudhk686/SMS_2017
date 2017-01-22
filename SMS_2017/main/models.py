@@ -5,11 +5,11 @@ from django.db import models
 start_money=1000000 #<complete> decide
 
 class Team(models.Model):
-	team_no = models.PositiveIntegerField(primary_key=True)
-	password = models.PositiveIntegerField()
-	member1 = models.CharField(max_length=8)
-	member2 = models.CharField(max_length=8,default="NONE")
-	money = models.PositiveIntegerField(default=start_money)
+	team_no = models.CharField(primary_key=True, max_length=3) #For bitsians it will be last 3 digits of first idno
+	password = models.CharField(max_length=3) # Random generated 3 digit no.
+	id1 = models.CharField(max_length=12, default="", verbose_name="Paritcipant 1 ID") #idno of first participant. Format- 15059
+	id2 = models.CharField(max_length=12, default="",verbose_name="Paritcipant 2 ID") #idno of second participant
+	money = models.IntegerField(default=start_money)
 
 	def __unicode__(self):
-		return self.member1
+		return self.team_no

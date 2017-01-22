@@ -1,32 +1,32 @@
 from django.http import HttpResponse
 from django.shortcuts import render_to_response
-from django.template import RequestContext
 from models import *
+from forms import *
 from random import randint
+import re
 
-def register(request):
-	context = RequestContext(request)
-	registered = False
+def BitsRegistrationView(request): #Registration for first degree bitsians
 
 	if request.method == 'POST':
-		T=Team()
-		T.member1 = request.POST['member1']
-		T.member2 = request.POST['member2']
+		form=BitsRegistrationForm(request.POST)
 
-		team_name = T.member1
-		team_no = team_name[1:8]
-		T.team_no = int(team_no)
+		if form.is_valid():
+			team=form.save(commit=False)
 
-		T.password = randint(1,99)
-		T.save()
-		registered=True    	
+			id1=form.cleaned_data['id1']
 
-		form_dict = {'registered':registered,'team_no':T.team_no,'password':T.password}
+			idRegex=re.compile(r'(\d\d)(\d\d\d)')
 
-		return render_to_response('main/register.html',form_dict,context)
+			mo=idRegex.search(id1)
+			
+			team.team_no=mo.group(2)
+			team.password=randint(101,999)
+			team.save()
+			form=BitsRegistrationForm()
 		
 
 
 	else:
-		
-		return render_to_response('main/register.html',context)
+		form=BitsRegistrationForm()
+
+	return render_to_response('main/register.html',{'form':form})	
