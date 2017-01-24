@@ -1,22 +1,19 @@
 <html>
 <head>
-	<title>FD Bitsian Registration</title>
+	<title>Registration</title>
 </head>
 <body>
 	<h1><center>REGISTER HERE</center></h1>
 	<br>
-	<h2><center>Registration for First Degree Bitsians</center></h2>
-	<br>
 	<center>
-	<h3> Id Number Format: 15059</h3>
-	<br>
-	<form id="form" method="POST" action="/register/bits">
+	<h2> Registration for Higher Degree and Outstations</h2>
+
+	<form id="form" method="POST" action="/register/other/">
 	{% csrf_token %}
 	<br>
 	ID 1 :<input type="text" name="id1" />
 	<br>
 	ID 2 :<input type="text" name="id2" />
-	
 	
 	<br>
 	<input type="submit" value="Register"/></center>

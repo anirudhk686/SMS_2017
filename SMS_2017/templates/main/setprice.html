@@ -1,0 +1,29 @@
+<html>
+<head>
+	<title>set price</title>
+</head>
+<body>
+<br>
+<h1><center>CLICK HERE</center></h1>
+<br>
+	<form method="POST" action="/setprice/">
+	{% csrf_token %}
+<center>
+    <br>
+    <label>FOR ROUND:</label>
+            <select name ="round">
+            <option value = 1>1</option> 
+            <option value = 2>2</option>  
+            <option value = 3>3</option>  
+            </select>
+    <br>
+	
+    <input type="submit" value="SET PRICE"/>
+</center>
+
+
+
+
+</form>
+</body>
+</html>
