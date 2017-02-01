@@ -77,8 +77,6 @@ def trade(request):
 			
 			teamno = int(request.POST['teamno'])
 			password = int(request.POST['password'])
-			
-			#---- ADD EXCEPTION HANDLING HERE-----
 			team = Team.objects.get(team_no=teamno)
 			#authenticate
 			if (team.password==password):
