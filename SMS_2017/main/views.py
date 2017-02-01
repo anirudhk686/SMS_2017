@@ -20,7 +20,7 @@ def bitsRegistrationView(request): #Registration for first degree bitsians
 		team.password=randint(101,999)
 		team.team_no = int(team.id1)
 		team.save()
-    	#-------EDIT ADD JS ----------
+		#-------EDIT ADD JS ----------
 		team_dict = {'team_no':team.team_no,'password':team.password}
 		return render_to_response('main/test.html',team_dict)
 		
@@ -39,18 +39,20 @@ def otherRegistrationView(request): #Registration for the rest
 		team.id1 = request.POST['id1']
 		team.id2 = request.POST['id2']
 		team.password=randint(101,999)
+		team.mobile_no = request.POST['contact']
 
 		#since outstees id may not be in 15474 pattern we assign them team nos starting form 20001
 		#we increment the update the model once that number is assigned
 
 		otherteamno = Admin_control.objects.all()[0]
 		team.team_no = otherteamno.Other_teamno
+
 		team.save()
 		# increment teamno for next team
 		otherteamno.Other_teamno += 1
 		otherteamno.save()
 
-    	#-------EDIT ADD JS ----------
+		#-------EDIT ADD JS ----------
 		team_dict = {'team_no':team.team_no,'password':team.password}
 		return render_to_response('main/test.html',team_dict)
 
@@ -59,12 +61,16 @@ def otherRegistrationView(request): #Registration for the rest
 		return render_to_response('main/otherregister.html',)	
 
 def trade(request):
-	stocklist1 = StockList.objects.all() 	#	getting all stock names
+	admin_object = Admin_control.objects.all()[0]#	getting the round_no which entered by us in admin_view
+	roundno = admin_object.round_no
+	stockinfo = StockInfo.objects.filter(round_no=roundno) 	#	getting all stock
 	
-	if request.method == 'POST':
+	if request.method == 'POST':			
+		
+		tradeEnable = admin_object.trade_enable
 
-		roundno = Admin_control.objects.all()[0].round_no 	#	getting the round_no which entered by us in admin 
-		if(roundno == 0): 		# 0 indicates trasition period for us to determine the stock prices - so no trading
+
+		if (tradeEnable==False): 		# false indicates trasition period for us to determine the stock prices - so no trading
 			return HttpResponse("sorry,Cannot trade now")
 
 		else:
@@ -92,11 +98,13 @@ def trade(request):
 						stock_left=0
 				
 
-				if ((action == 0)and(stock_left <= no_of_stock )):	
+				if ((action == 0)and(stock_left < no_of_stock )):	
 					return HttpResponse("not enough stocks to sell")
 
 				else:
 					# store trade details in Trade model
+					# --- NOTE IF EVENT NOT RUNNING EFFICIENTLY- WE CAN COMMENT THE TRADELOG PART-----
+
 					tradelog =  Tradebook()
 					tradelog.team = team
 					tradelog.stockname = stock_name
@@ -135,19 +143,32 @@ def trade(request):
 
 					sl.save()
 
+					
+					'''
+					update StockInfo model : field - number of stock left
+					'''
+					si = [e for e in stockinfo if e.name == stock_name]
+					si = si[0]
+					if action==1: # stock bought
+						si.left = si.left + no_of_stock
+					else:
+						si.left = si.left - no_of_stock
+
+					si.save()
+
+
 
 					'''
 					now affect changes in trader's account
 					get price of that stock from StockPrice model
 					'''
 
-					s = StockList.objects.get(name=tradelog.stockname)
-					sp= StockPrice.objects.get(stock=s,round_no=roundno).pricefinal
+					sprice = si.pricefinal
 
 					if action == 1: #buy - so subtract money from trader's account
-						team.money = team.money - (sp*tradelog.num)
+						team.money = team.money - (sprice*no_of_stock)
 					else:			# sell - add money to traders account
-						team.money = team.money + (sp*tradelog.num)
+						team.money = team.money + (sprice*no_of_stock)
 
 					team.save()
 
@@ -157,51 +178,56 @@ def trade(request):
 			else:
 				return HttpResponse("Invalid teamno/password")
 
-	else:
-		
-		return render_to_response('main/trade.html',{'stocklist':stocklist1})
+	else:		
 
-def setprice(request):
+		return render_to_response('main/trade.html',{'stocklist':stockinfo})
+
+
+def admin_control(request):
+	'''
+	---  IMPORTANT -----
+	while changing price after completion of round
+	follow this order
+	a) set trade_enable to false
+	b) then change round
+	c) then setprice
+	d) set trade_enable to true
+	'''
+	admin_object = Admin_control.objects.all()[0]
+
 	if request.method == 'POST':
+		# -------EDIT HERE------------------
+		# ----- USE setprice()----
+		return 
 
-		'''
-		# determine price using Tradebook data 
-		# save the prices to StockPrice model
-		roundno = request.POST['round']# we cannot use from database as we would have set it 0
-		stocklist = StockList.objects.all()
-		
-		# update StockPrice objects for this round for all stocks in StockList
+	else :
 
-		for s in stocklist:
-			sp= StockPrice.objects.get(stock=s,round_no=roundno)
-			# now to set its pricefinal we need to count to number of stocks bought/sold of that name in this round
-			# we will use Tradebook data
-			tb_buy = Tradebook.objects.filter(stockname=s.name,round_no=roundno)
-			total=0# gives us total number of stock bought-sold
-			for tb in tb_buy:
-				if tb.call == True:
-					total= total + tb.num
-				else:
-					total = total - tb.num
+		current_round = admin_object.round_no
+		trade_enable = admin_object.trade_enable
 
-			# update the pricefinal depending upon total and priceinitial and total
+		return render_to_response('main/admin_control.html',{'current_round':current_round,'trade_enable':trade_enable})
 
+
+
+def setprice(roundno):
+	# determine prices using left field in StockInfo model
+	# save the new prices to its pricefinal field 
+
+	stockinfo = StockInfo.objects.filter(round_no=roundno)
+
+	if (roundno == 1):
+		# raise error
+		# we set pricefinal = priceinitial for round 1 in initial.py script 
+		return
+	else:
+		for s in stockinfo :
 			# -------EDIT HERE-------
 			# Exact formulae to update
-
-			sp.pricefinal = sp.priceinitial + ((total/100)*priceinitial)
-			sp.save()
-			'''
-
-		return HttpResponse("Price set successful")
+			s.pricefinal = s.priceinitial + (s.left/1000)* s.priceinitial
+			s.save()
+		
 
 
-	else:
-		set_price = SetPrice.objects.all()[0].setprice
-		roundno = Round.objects.all()[0].round_no
 
-		if ((set_price==True)and(roundno==0)):
-			# prices can be set now 
-			return render_to_response('main/setprice.html',)
-		else:
-			return HttpResponse("cannot set prices now")
+			
+

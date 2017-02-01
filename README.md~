@@ -6,7 +6,7 @@ Python 2.7
 Django 1.10
 
 ##IMPORTANT INSTRUCTIONS
-1. First run intial.py script(present in main app folder)
+1. First run intial.py script
    --do not forget to set pricefinal = priceinitial for round 1 in initial.py script 
 2. while changing price after completion of round
 	follow this order
