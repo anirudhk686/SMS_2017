@@ -7,22 +7,19 @@
 	<br>
 	<h2><center>Registration for First Degree Bitsians</center></h2>
 	<br>
+	<center>
 	<h3> Id Number Format: 15059</h3>
-
-	<form id="form" method="post" action="register/bits">
+	<br>
+	<form id="form" method="POST" action="/register/bits">
 	{% csrf_token %}
-	{% for hidden in form.hidden_fields %}
-                {{ hidden }}
-            {% endfor %}
-
-            {% for field in form.visible_fields %}
-                <center>{{ field.errors }}
-                {{ field.help_text }}
-                {{ field }}</center>
-            {% endfor %}
+	<br>
+	ID 1 :<input type="text" name="id1" />
+	<br>
+	ID 2 :<input type="text" name="id2" />
 	
-
-	<center><input type="submit" value="Register"/></center>
+	
+	<br>
+	<input type="submit" value="Register"/></center>
 
 	
 

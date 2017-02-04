@@ -1,0 +1,29 @@
+<html>
+<head>
+	<title>Registration</title>
+</head>
+<body>
+	<h1><center>REGISTER HERE</center></h1>
+	<br>
+	<center>
+	<h2> Registration for Higher Degree and Outstations</h2>
+
+	<form id="form" method="POST" action="/register/other/">
+	{% csrf_token %}
+	<br>
+	ID 1/name 1 :<input type="text" name="id1" />
+	<br>
+	ID 2/name 2 :<input type="text" name="id2" />
+	<br>
+	contact number :<input type="number" name="contact" />
+	<br>
+	<input type="submit" value="Register"/></center>
+
+	
+
+
+
+</form>
+</body>
+
+</html>

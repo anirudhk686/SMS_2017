@@ -1,0 +1,39 @@
+<html>
+<head>
+	<title>trade form</title>
+</head>
+<body>
+<br>
+<h1><center>TRADE HERE</center></h1>
+<br>
+	<form method="POST" action="/trade/">
+	{% csrf_token %}
+<center>
+	Team No :<input type="number" name="teamno"  />
+	<br>
+	password :<input type="number" name="password"  />
+	<br>
+	<label>Select stock :</label>
+             <select name ="stock">
+               {%for stock in stocklist%}
+               <option value = {{stock.name}}>{{stock.name}}</option>
+               {%endfor%}               
+             </select>
+    <br>
+    <label>action :</label>
+    		<select name ="action">
+    		<option value = 0>sell</option>	
+    		<option value = 1>buy</option>	
+    		</select>
+    <br>
+    stocks number :<input type="number" name="number"  />
+    <br>
+    <input type="submit" value="submit"/>
+</center>
+
+
+
+
+</form>
+</body>
+</html>
