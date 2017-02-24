@@ -1,4 +1,4 @@
-from django.http import HttpResponse
+from django.http import HttpResponse, JsonResponse
 from django.shortcuts import render_to_response
 from models import *
 from forms import *
@@ -227,6 +227,29 @@ def setprice(roundno):
 			# Exact formulae to update
 			s.pricefinal = s.priceinitial + (s.left/1000)* s.priceinitial
 			s.save()
+
+
+def stockList(request):
+	admin_control=Admin_control.objects.all()
+	round_no=admin_control[0].round_no
+	stocks=StockInfo.objects.filter(round_no=round_no)
+	p={}
+	for i in stocks:
+		p[(i.name)]=[i.pricefinal,(i.pricefinal-i.priceinitial)]
+
+
+	return JsonResponse(p, safe=False)
+
+def teamRanks(request):
+	players=Team.objects.all().order_by('money')
+	p={}
+	k=1
+	for i in players:
+		p[k]=[i.team_no,i.money]
+	return JsonResponse(p, safe=False)
+
+
+
 		
 
 
