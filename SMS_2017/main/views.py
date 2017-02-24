@@ -234,9 +234,12 @@ def stockList(request):
 	round_no=admin_control[0].round_no
 	stocks=StockInfo.objects.filter(round_no=round_no)
 	p={}
+	k=1
 	for i in stocks:
 		p[(i.name)]=[i.pricefinal,(i.pricefinal-i.priceinitial)]
-
+		k+=1
+		if k==10:
+			break
 
 	return JsonResponse(p, safe=False)
 
@@ -246,9 +249,21 @@ def teamRanks(request):
 	k=1
 	for i in players:
 		p[k]=[i.team_no,i.money]
+		k+=1
+		if k==11:
+			break
 	return JsonResponse(p, safe=False)
 
-
+def Transactions(request):
+	trades=Tradebook.objects.all()
+	p={}
+	k=1
+	for i in trades:
+		p[k]=[i.team.team_no,i.stockname,i.call,i.num]
+		k+=1
+		if k==11:
+			break
+	return JsonResponse(p, safe=False)
 
 		
 

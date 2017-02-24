@@ -7,5 +7,6 @@ urlpatterns = [
     url(r'trade',views.trade),# link to trade(buy/sell)
     url(r'^stocks/',views.stockList),
     url(r'^ranks/',views.teamRanks),
+    url(r'^transactions/',views.Transactions),
     url(r'admin_control',views.admin_control)
 ]
