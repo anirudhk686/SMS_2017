@@ -9,7 +9,7 @@ class Team(models.Model):
 													#for other it will be 5 digit no. starting from 20001
 	password = models.IntegerField() # Random generated 3 digit no.
 
-	id1 = models.CharField(max_length=20)#For bitsians first degree -idno of first participant. Format- 15059
+	id1 = models.CharField(max_length=20,default="")#For bitsians first degree -idno of first participant. Format- 15059
 										 #for other can take name of particapants or their id
 	id2 = models.CharField(max_length=20,default="") 
 

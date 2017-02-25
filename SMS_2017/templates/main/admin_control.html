@@ -6,14 +6,51 @@
 <br>
 <h1><center>ADMIN PANEL</center></h1>
 <br>
+<center>
+	<H2>ROUNDS PART</H2>
 	<form method="POST" action="/admin_control/">
 	{% csrf_token %}
-<center>
+	CURRENT ROUND : <B>{{current_round}}</B>
     <br>
-    
+    <B>NOTE: DISABLE TRADE BEFORE CHANGING ROUND</B>
+    <br>
+    <label>CHANGE ROUND:</label>
+    		<select name ="round">
+    		<option value = 1>round 1</option>	
+    		<option value = 2>round 2</option>
+    		<option value = 3>round 3</option>	
+    		</select>
+    <BR>
+    <input type="submit" name="submit" value="CHANGE ROUND" />
+    <BR>
+    <br>
+    <H2>TRADING PART</H2>
+	<form method="POST" action="/admin_control/">
+	{% csrf_token %}
+	CURRENT STATUS : 
+    {%if trade_enable%}
+    <B>TRADE ENABLED</B>
+    {%else%}
+    <B>TRADE DISABLED</B>
+    {%endif%}
+    <br>
 
-	
-    <input type="submit" />
+    <label>CHANGE STATUS:</label>
+    		<select name ="status">
+    		<option value = 1>ENABLE TRADE</option>	
+    		<option value = 0>DISABLE TRADE</option>
+    		</select>
+    <br>
+    <input type="submit" name="submit" value="CHANGE STATUS" />
+    <BR>
+    <br>
+    <H2>SETPRICE PART</H2>
+	<form method="POST" action="/admin_control/">
+	{% csrf_token %}
+	NOTE: make sure trading in disabled
+    <br>
+	<input type="submit" name="submit" value="SET PRICE" /> 
+
 </center>
 
 

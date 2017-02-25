@@ -18,19 +18,26 @@ def bitsRegistrationView(request): #Registration for first degree bitsians
 		
 		team = Team()
 
-		team.id1 = request.POST['id1']
-		team.id2 = request.POST['id2']
+		id1 = request.POST['id1']
+		team.id1 = str(id1)
+		team.id2 = str(request.POST['id2'])
 		team.password=randint(101,999)
-		team.team_no = int(team.id1)
-		team.save()
-		#-------EDIT ADD JS ----------
-		team_dict = {'team_no':team.team_no,'password':team.password}
-		return render_to_response('main/test.html',team_dict)
+		team.team_no = id1
+
+		#check if the teamno is already registered
+		try:
+			t = Team.objects.get(team_no=team.team_no)
+			return HttpResponse("team number already registered")
+		except Team.DoesNotExist:
+			team.save()
+
+			#-------EDIT ADD JS ----------
+			team_dict = {'team_no':team.team_no,'password':team.password,'page':0}
+			return render_to_response('main/regJS.html',team_dict)
 		
 	else:
 		
 		return render_to_response('main/bitsregister.html',)
-
 
 @csrf_exempt
 def otherRegistrationView(request): #Registration for the rest
@@ -57,8 +64,8 @@ def otherRegistrationView(request): #Registration for the rest
 		otherteamno.save()
 
 		#-------EDIT ADD JS ----------
-		team_dict = {'team_no':team.team_no,'password':team.password}
-		return render_to_response('main/test.html',team_dict)
+		team_dict = {'team_no':team.team_no,'password':team.password,'page':1}
+		return render_to_response('main/regJS.html',team_dict)
 
 		
 	else:
@@ -104,14 +111,21 @@ def trade(request):
 					if sl == None:
 						stock_left=0
 				
-
+				#check if team has enough stocks to sell
 				if ((action == 0)and(stock_left < no_of_stock )):	
 					return HttpResponse("not enough stocks to sell")
 
+				#check if team has enough money to buy
+				si = [e for e in stockinfo if e.name == stock_name]
+				si = si[0]
+				sprice = si.pricefinal
+
+				if((action == 1)and(team.money<(sprice*no_of_stock))):
+					return HttpResponse("not enough money")
+
 				else:
 					# store trade details in Trade model
-					# --- NOTE IF EVENT NOT RUNNING EFFICIENTLY- WE CAN COMMENT THE TRADELOG PART-----
-
+					
 					tradelog =  Tradebook()
 					tradelog.team = team
 					tradelog.stockname = stock_name
@@ -154,8 +168,7 @@ def trade(request):
 					'''
 					update StockInfo model : field - number of stock left
 					'''
-					si = [e for e in stockinfo if e.name == stock_name]
-					si = si[0]
+					
 					if action==1: # stock bought
 						si.left = si.left + no_of_stock
 					else:
@@ -170,7 +183,7 @@ def trade(request):
 					get price of that stock from StockPrice model
 					'''
 
-					sprice = si.pricefinal
+					
 
 					if action == 1: #buy - so subtract money from trader's account
 						team.money = team.money - (sprice*no_of_stock)
@@ -179,13 +192,14 @@ def trade(request):
 
 					team.save()
 
-					return HttpResponse("Trade success")
+					return render_to_response('main/tradeJS.html',{'money':team.money})
 					
 
 			else:
 				return HttpResponse("Invalid teamno/password")
 
-	else:
+	else:		
+
 		return render_to_response('main/trade.html',{'stocklist':stockinfo})
 
 
@@ -202,17 +216,48 @@ def admin_control(request):
 	'''
 	admin_object = Admin_control.objects.all()[0]
 
-	if request.method == 'POST':
-		# -------EDIT HERE------------------
-		# ----- USE setprice()----
-		return 
+	if (request.user.is_superuser):
 
-	else :
+		if request.method == 'POST':
+			submit = request.POST['submit']
+			if (submit=='CHANGE ROUND'):
+				if admin_object.trade_enable == True:
+					return HttpResponse("disable trade before changing round")
+				else:
+					rnd = int(request.POST['round'])
+					admin_object.round_no = rnd
+					admin_object.save()
+					return render_to_response('main/admin_control1.html',{'current_round':admin_object.round_no,'category':1})
 
-		current_round = admin_object.round_no
-		trade_enable = admin_object.trade_enable
+			elif (submit=='CHANGE STATUS'):
+				status= int(request.POST['status'])
+				if status==0:
+					admin_object.trade_enable = False
+				else:
+					admin_object.trade_enable = True
+				admin_object.save()
+				return render_to_response('main/admin_control1.html',{'status':admin_object.trade_enable,'category':2})
+			
+			else:
+				current_round = admin_object.round_no
+				if (admin_object.trade_enable == True):
+					return HttpResponse("first disable trade")
+				elif (current_round==1):
+					return HttpResponse("cannot set price for round 1")
+				else:
+					setprice(current_round)
+					return render_to_response('main/admin_control1.html',{'round':(admin_object.round_no),'category':3})
 
-		return render_to_response('main/admin_control.html',{'current_round':current_round,'trade_enable':trade_enable})
+
+		else :
+
+			current_round = admin_object.round_no
+			trade_enable = admin_object.trade_enable
+
+			return render_to_response('main/admin_control.html',{'current_round':current_round,'trade_enable':trade_enable})
+
+	else:
+		return HttpResponse("admin login required to veiw this page")
 
 
 @csrf_exempt
@@ -221,17 +266,14 @@ def setprice(roundno):
 	# save the new prices to its pricefinal field 
 
 	stockinfo = StockInfo.objects.filter(round_no=roundno)
-
-	if (roundno == 1):
-		# raise error
-		# we set pricefinal = priceinitial for round 1 in initial.py script 
-		return
-	else:
-		for s in stockinfo :
+	for s in stockinfo :
 			# -------EDIT HERE-------
 			# Exact formulae to update
-			s.pricefinal = s.priceinitial + (s.left/1000)* s.priceinitial
-			s.save()
+			# USE s.left 
+		s.pricefinal = s.priceinitial + 100
+		s.save()
+	return
+	
 
 @csrf_exempt
 def stockList(request):

@@ -1,0 +1,53 @@
+<html>
+<head>
+	<title>test</title>
+</head>
+<body>
+<br>
+<h1><center></center></h1>
+<br>
+<center>
+    {%ifequal category 1%}
+    ROUND CHANGE SUCCESSFUL
+    <br>
+    CURRENT ROUND:{{current_round}}
+    <br>
+    <form method="GET" action="/admin_control/">
+    <br>
+    <input type="submit" value="OK"/>
+    {%endifequal%}
+    {%ifequal category 2%}
+    CHANGE SUCCESSFUL
+    <br>
+    CURRENT STATUS:
+    {%if status%}
+    TRADE ENABLED
+    {%else%}
+    TRADE DISABLED
+    {%endif%}
+    <br>
+    <form method="GET" action="/admin_control/">
+    <br>
+    <input type="submit" value="OK"/>
+    {%endifequal%}
+    {%ifequal category 3%}
+    PRICE SET SUCCESS
+    <br>
+    FOR <B>ROUND {{round}}</B> 
+    <br>
+    <form method="GET" action="/admin_control/">
+    <br>
+    <input type="submit" value="OK"/>
+
+
+    {%endifequal%}
+    
+
+</center>
+
+
+
+
+</form>
+</body>
+</html>

@@ -9,9 +9,9 @@
 	<form method="POST" action="/trade/">
 	{% csrf_token %}
 <center>
-	Team No :<input type="number" name="teamno"  />
+	Team No :<input type="number" name="teamno" required />
 	<br>
-	password :<input type="number" name="password"  />
+	password :<input type="number" name="password" required />
 	<br>
 	<label>Select stock :</label>
              <select name ="stock">
@@ -26,7 +26,7 @@
     		<option value = 1>buy</option>	
     		</select>
     <br>
-    stocks number :<input type="number" name="number"  />
+    stocks number :<input type="number" name="number" min="1" required/>
     <br>
     <input type="submit" value="submit"/>
 </center>

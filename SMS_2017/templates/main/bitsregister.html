@@ -1,33 +1,6 @@
 <html>
 <head>
-	<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.8.3/jquery.min.js"></script>
-<title>FD Bitsian Registration</title>
-<style>
-#popup{
-	display: none;
-	position: absolute;
-    width: 250px;
-    height: 100px;
-    padding: 20px;
-    top: 0;
-    left: 0;
-    color: black;
-    right: 0;
-    bottom: 0;
-    margin: auto;
-    background: white;
-}
-#backdrop{
-	display: none;
-	position: absolute;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    margin: auto;
-    background: rgba(0,0,0,0.7);
-}
-</style>
+	<title>FD Bitsian Registration</title>
 </head>
 <body>
 	<h1><center>REGISTER HERE</center></h1>
@@ -40,37 +13,19 @@
 	<form id="form" method="POST" action="/register/bits">
 	{% csrf_token %}
 	<br>
-	ID 1 :<input type="text" name="id1" />
+	ID 1 :<input type="number" name="id1" min="10000" max="99999"required/>
 	<br>
-	ID 2 :<input type="text" name="id2" />
+	ID 2 :<input type="number" name="id2" max="99999" />
 	
 	
 	<br>
 	<input type="submit" value="Register"/></center>
 
 	
-	
+
+
 
 </form>
-<button id="open_popup">Hello</button>
-	<div id="backdrop"></div>
-	<div id="popup">
-		<h1> hello</h1>
-		<p>ok</p>
-	</div>
-<script>
-$(document).ready(function(){
-	$('#open_popup').click(function(){
-		console.log("hey");
-		$('#backdrop').fadeIn();
-		$('#popup').fadeIn();
-	});
-	$('#backdrop').click(function(){
-		$('#backdrop').fadeOut();
-		$('#popup').fadeOut();
-	});
-});
-</script>
 </body>
 
 </html>
