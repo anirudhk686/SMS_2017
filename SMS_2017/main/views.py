@@ -248,7 +248,8 @@ def teamRanks(request):
 	p={}
 	k=1
 	for i in players:
-		p[k]=[i.team_no,i.money]
+		l="Rank "+str(k)
+		p[l]=[i.team_no,i.money]
 		k+=1
 		if k==11:
 			break
@@ -259,7 +260,8 @@ def Transactions(request):
 	p={}
 	k=1
 	for i in trades:
-		p[k]=[i.team.team_no,i.stockname,i.call,i.num]
+		l="Transaction "+str(k)
+		p[l]=[i.team.team_no,i.stockname,i.call,i.num]
 		k+=1
 		if k==11:
 			break
