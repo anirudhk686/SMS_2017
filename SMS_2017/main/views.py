@@ -4,11 +4,14 @@ from models import *
 from forms import *
 from random import randint
 import re
+from django.views.decorators.csrf import csrf_exempt
 
 
 
 
 
+
+@csrf_exempt
 def bitsRegistrationView(request): #Registration for first degree bitsians
 
 	if request.method == 'POST':
@@ -29,6 +32,7 @@ def bitsRegistrationView(request): #Registration for first degree bitsians
 		return render_to_response('main/bitsregister.html',)
 
 
+@csrf_exempt
 def otherRegistrationView(request): #Registration for the rest
 
 	if request.method == 'POST':
@@ -60,6 +64,7 @@ def otherRegistrationView(request): #Registration for the rest
 	else:
 		return render_to_response('main/otherregister.html',)	
 
+@csrf_exempt
 def trade(request):
 	admin_object = Admin_control.objects.all()[0]#	getting the round_no which entered by us in admin_view
 	roundno = admin_object.round_no
@@ -180,11 +185,11 @@ def trade(request):
 			else:
 				return HttpResponse("Invalid teamno/password")
 
-	else:		
-
+	else:
 		return render_to_response('main/trade.html',{'stocklist':stockinfo})
 
 
+@csrf_exempt
 def admin_control(request):
 	'''
 	---  IMPORTANT -----
@@ -210,7 +215,7 @@ def admin_control(request):
 		return render_to_response('main/admin_control.html',{'current_round':current_round,'trade_enable':trade_enable})
 
 
-
+@csrf_exempt
 def setprice(roundno):
 	# determine prices using left field in StockInfo model
 	# save the new prices to its pricefinal field 
@@ -228,40 +233,47 @@ def setprice(roundno):
 			s.pricefinal = s.priceinitial + (s.left/1000)* s.priceinitial
 			s.save()
 
-
+@csrf_exempt
 def stockList(request):
 	admin_control=Admin_control.objects.all()
 	round_no=admin_control[0].round_no
 	stocks=StockInfo.objects.filter(round_no=round_no)
-	p={}
+	p=[]
 	k=1
 	for i in stocks:
-		p[(i.name)]=[i.pricefinal,(i.pricefinal-i.priceinitial)]
+		p.append([i.name,i.pricefinal,(i.pricefinal-i.priceinitial)])
 		k+=1
 		if k==10:
 			break
 
 	return JsonResponse(p, safe=False)
 
+
+@csrf_exempt
 def teamRanks(request):
 	players=Team.objects.all().order_by('money')
-	p={}
+	p=[]
 	k=1
 	for i in players:
-		l="Rank "+str(k)
-		p[l]=[i.team_no,i.money]
+		p.append([i.team_no,i.money])
 		k+=1
 		if k==11:
 			break
 	return JsonResponse(p, safe=False)
 
+@csrf_exempt
 def Transactions(request):
 	trades=Tradebook.objects.all()
-	p={}
+	p=[]
 	k=1
+
 	for i in trades:
-		l="Transaction "+str(k)
-		p[l]=[i.team.team_no,i.stockname,i.call,i.num]
+		if i.call==True:
+			l="Buy"
+		else:
+			l="Sell"
+
+		p.append([i.team.team_no,i.stockname,l,i.num])
 		k+=1
 		if k==11:
 			break
