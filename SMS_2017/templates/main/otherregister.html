@@ -11,11 +11,11 @@
 	<form id="form" method="POST" action="/register/other/">
 	{% csrf_token %}
 	<br>
-	ID 1/name 1 :<input type="text" name="id1" />
+	ID 1/name 1 :<input type="text" name="id1" required/>
 	<br>
 	ID 2/name 2 :<input type="text" name="id2" />
 	<br>
-	contact number :<input type="number" name="contact" />
+	contact number :<input type="number" name="contact" min="1000000000" max="9999999999" required/>
 	<br>
 	<input type="submit" value="Register"/></center>
 
