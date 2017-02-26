@@ -1,8 +1,9 @@
 <!DOCTYPE html>
 {%load staticfiles%}
+{%load static%}
 <html lang="en">
 <head>
-  <title>General Registration</title>
+  <title>BITSian Registration</title>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <link rel="stylesheet" href="{%static "bootstrap-3.3.7-dist/css/bootstrap.min.css"%}">
@@ -12,24 +13,19 @@
 <body>
 
 <div class="container">
-  <h2>Register Here (Others)</h2>
+  <h2>Register Here</h2>
   <form id="form">
     <div class="form-group">
-      <label for="ID 1 ">ID 1/ Name 1:</label>
+      <label for="ID 1 ">ID 1:</label>
       <input type="text" class="form-control" id="id1" name="id1" placeholder="Enter First ID">
     </div>
     <div class="form-group">
-      <label for="ID 2">ID 2/ Name 2:</label>
+      <label for="">ID 2:</label>
       <input type="text" class="form-control" id="id2" name="id2" placeholder="Enter Second ID">
-    </div>
-    <div class="form-group">
-      <label for="">Contact Number:</label>
-      <input type="text" class="form-control" id="contact" name="contact" placeholder="Enter Contact Number">
     </div>
     <button type="submit" value="Register" class="btn btn-default">Register</button>
   </form>
 </div>
-
 <div id="myModal" class="modal fade" role="dialog">
   <div class="modal-dialog">
 
@@ -51,16 +47,16 @@
 $('#form').submit(function(e){
   e.preventDefault();
   $.ajax({
-    url: "/register/other",
+    url: "/register/",
     type: 'POST',
     dataType: "html",
-    data: {id1: $('#id1').val(), id2: $('#id2').val(), contact: $('#contact').val()},
-    success: function(response) {
-      $('#myModal').find('.modal-body').html(response);   
-      $('#myModal').modal(); 
+    data: {id1: $('#id1').val(), id2: $('#id2').val()},
+    success: function(response) {   
+      $('#myModal').modal();
+      $('#myModal').find('.modal-body').html(response);
       $('#id1').val("");
       $('#id2').val("");
-      $('#contact').val("");
+      //$('#myModal').on('hide.bs.modal', location.reload());
     },
     error: function(){
       $('#myModal').modal();

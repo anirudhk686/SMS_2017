@@ -3,7 +3,7 @@ from django.shortcuts import render_to_response
 from models import *
 from forms import *
 from random import randint
-import re
+import re, json
 from django.views.decorators.csrf import csrf_exempt
 
 
@@ -13,11 +13,9 @@ from django.views.decorators.csrf import csrf_exempt
 
 @csrf_exempt
 def bitsRegistrationView(request): #Registration for first degree bitsians
-
 	if request.method == 'POST':
-		
 		team = Team()
-
+		
 		id1 = request.POST['id1']
 		team.id1 = str(id1)
 		team.id2 = str(request.POST['id2'])
@@ -27,17 +25,17 @@ def bitsRegistrationView(request): #Registration for first degree bitsians
 		#check if the teamno is already registered
 		try:
 			t = Team.objects.get(team_no=team.team_no)
-			return HttpResponse("team number already registered")
+			return HttpResponse("Team Number Already Registered")
 		except Team.DoesNotExist:
 			team.save()
 
 			#-------EDIT ADD JS ----------
-			team_dict = {'team_no':team.team_no,'password':team.password,'page':0}
-			return render_to_response('main/regJS.html',team_dict)
+			team_dict = {'team_no':team.team_no,'password':team.password}
+		return JsonResponse(team_dict)
 		
 	else:
 		
-		return render_to_response('main/bitsregister.html',)
+		return render_to_response('main/bitsregister1.html',)
 
 @csrf_exempt
 def otherRegistrationView(request): #Registration for the rest
@@ -65,7 +63,7 @@ def otherRegistrationView(request): #Registration for the rest
 
 		#-------EDIT ADD JS ----------
 		team_dict = {'team_no':team.team_no,'password':team.password,'page':1}
-		return render_to_response('main/regJS.html',team_dict)
+		return JsonResponse(team_dict)
 
 		
 	else:
@@ -192,7 +190,7 @@ def trade(request):
 
 					team.save()
 
-					return render_to_response('main/tradeJS.html',{'money':team.money})
+					return JsonResponse({'money':team.money})
 					
 
 			else:
@@ -320,6 +318,9 @@ def Transactions(request):
 		if k==11:
 			break
 	return JsonResponse(p, safe=False)
+
+def Dashboard(request):
+	return render_to_response('main/dashboard.html',{})
 
 		
 

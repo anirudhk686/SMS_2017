@@ -1,31 +1,78 @@
-<html>
+<!DOCTYPE html>
+<html lang="en">
 <head>
-	<title>FD Bitsian Registration</title>
+  <title>BITSian Registration</title>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.1.1/jquery.min.js"></script>
+  <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap3-dialog/1.34.7/css/bootstrap-dialog.min.css">
+<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap3-dialog/1.34.7/js/bootstrap-dialog.min.js"></script>
+  <style>
+  #popup{
+    display: none;
+    position: absolute;
+      width: 250px;
+      height: 100px;
+      padding: 20px;
+      top: 0;
+      left: 0;
+      color: black;
+      right: 0;
+      bottom: 0;
+      margin: auto;
+      background: white;
+  }
+  #backdrop{
+    display: none;
+    position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      margin: auto;
+      background: rgba(0,0,0,0.7);
+  }
+  </style>
 </head>
 <body>
-	<h1><center>REGISTER HERE</center></h1>
-	<br>
-	<h2><center>Registration for First Degree Bitsians</center></h2>
-	<br>
-	<center>
-	<h3> Id Number Format: 15059</h3>
-	<br>
-	<form id="form" method="POST" action="/register/bits">
-	{% csrf_token %}
-	<br>
-	ID 1 :<input type="number" name="id1" min="10000" max="99999"required/>
-	<br>
-	ID 2 :<input type="number" name="id2" max="99999" />
-	
-	
-	<br>
-	<input type="submit" value="Register"/></center>
 
-	
+<div class="container">
+  <h2>Register Here</h2>
+  <form id="form">
+    <div class="form-group">
+      <label for="ID 1 ">ID 1:</label>
+      <input type="text" class="form-control" id="id1" name="id1" placeholder="Enter First ID">
+    </div>
+    <div class="form-group">
+      <label for="">ID 2:</label>
+      <input type="text" class="form-control" id="id2" name="id2" placeholder="Enter Second ID">
+    </div>
+    <button type="submit" value="Register" class="btn btn-default">Register</button>
+  </form>
+</div>
+<div id="backdrop"></div>
+  <div id="popup">
+    <h1> hello</h1>
+    <p>ok</p>
+  </div>
+<script>
+$('#form').submit(function(e){
+  e.preventDefault();
+  $.ajax({
+    url: "/register/",
+    type: 'POST',
+    dataType: "jsonp",
+    data: {id1: $('#id1').val(), id2: $('#id2').val()},
+    success: function(data) {
+      console.log("request done...");
+      $('#popup').html(JSON.stringify(data));
+      $('#backdrop, #popup').fadeIn();     
+    }
+  });
+});
 
-
-
-</form>
+  </script>
 </body>
-
 </html>
