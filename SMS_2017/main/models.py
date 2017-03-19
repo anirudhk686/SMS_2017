@@ -2,7 +2,7 @@ from __future__ import unicode_literals
 from django.db import models
 
 
-start_money=1000000 #-----EDIT HERE ---------<complete> decide
+start_money=50000 #-----EDIT HERE ---------<complete> decide
 
 class Team(models.Model):
 	team_no = models.IntegerField(primary_key=True) #For bitsians first degree it will be last 5 digits of first idno
@@ -16,6 +16,8 @@ class Team(models.Model):
 	mobile_no = models.IntegerField(default=0) # to store outstee mobile number
 											# for bitsians it will be 0
 	money = models.IntegerField(default=start_money)
+
+	net_worth = models.IntegerField(default = start_money)
 
 	def __unicode__(self):
 		return str(self.team_no)
@@ -54,6 +56,9 @@ class Admin_control(models.Model):
 	Other_teamno = models.IntegerField()
 	# this will be used to assign team no to outstees during registration
 	# this is used in otherRegistrationView
+	total_teams = models.IntegerField(default=0)
+	starting_money = start_money
+
 	def __unicode__(self):
 		return "Admin_control"	
 

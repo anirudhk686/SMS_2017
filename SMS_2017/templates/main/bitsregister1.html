@@ -17,11 +17,11 @@
   <form id="form">
     <div class="form-group">
       <label for="ID 1 ">ID 1:</label>
-      <input type="text" class="form-control" id="id1" name="id1" placeholder="Enter First ID">
+      <input type="number" class="form-control" id="id1" name="id1" placeholder="Enter First ID" min="10000" max="99999" required>
     </div>
     <div class="form-group">
       <label for="">ID 2:</label>
-      <input type="text" class="form-control" id="id2" name="id2" placeholder="Enter Second ID">
+      <input type="number" class="form-control" id="id2" name="id2" placeholder="Enter Second ID" max="99999">
     </div>
     <button type="submit" value="Register" class="btn btn-default">Register</button>
   </form>
@@ -59,6 +59,7 @@ $('#form').submit(function(e){
       //$('#myModal').on('hide.bs.modal', location.reload());
     },
     error: function(){
+      $('#myModal').find('.modal-body').html(response);
       $('#myModal').modal();
     }
   });

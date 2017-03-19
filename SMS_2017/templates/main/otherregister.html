@@ -16,7 +16,7 @@
   <form id="form">
     <div class="form-group">
       <label for="ID 1 ">ID 1/ Name 1:</label>
-      <input type="text" class="form-control" id="id1" name="id1" placeholder="Enter First ID">
+      <input type="text" class="form-control" id="id1" name="id1" placeholder="Enter First ID" required>
     </div>
     <div class="form-group">
       <label for="ID 2">ID 2/ Name 2:</label>
@@ -24,7 +24,7 @@
     </div>
     <div class="form-group">
       <label for="">Contact Number:</label>
-      <input type="text" class="form-control" id="contact" name="contact" placeholder="Enter Contact Number">
+      <input type="number" class="form-control" id="contact" name="contact" placeholder="Enter Contact Number" min="1000000000" max="9999999999" required>
     </div>
     <button type="submit" value="Register" class="btn btn-default">Register</button>
   </form>
@@ -63,6 +63,7 @@ $('#form').submit(function(e){
       $('#contact').val("");
     },
     error: function(){
+      $('#myModal').find('.modal-body').html(response);
       $('#myModal').modal();
     }
   });

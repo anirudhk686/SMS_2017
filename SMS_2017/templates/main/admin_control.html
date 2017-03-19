@@ -3,14 +3,15 @@
 	<title>ADMIN PANEL</title>
 </head>
 <body>
-<br>
-<h1><center>ADMIN PANEL</center></h1>
-<br>
+
+<h3><center>ADMIN PANEL</center></h3>
+
 <center>
-	<H2>ROUNDS PART</H2>
+	<font color="blue"><H2>ROUNDS PART</H2></font>
 	<form method="POST" action="/admin_control/">
 	{% csrf_token %}
-	CURRENT ROUND : <B>{{current_round}}</B>
+	CURRENT ROUND : <B><font color="red">{{current_round}}</B></font>
+    <br>
     <br>
     <B>NOTE: DISABLE TRADE BEFORE CHANGING ROUND</B>
     <br>
@@ -18,22 +19,25 @@
     		<select name ="round">
     		<option value = 1>round 1</option>	
     		<option value = 2>round 2</option>
-    		<option value = 3>round 3</option>	
+    		<option value = 3>round 3</option>
+            <option value = 4>round 4</option>	
     		</select>
     <BR>
     <input type="submit" name="submit" value="CHANGE ROUND" />
     <BR>
     <br>
-    <H2>TRADING PART</H2>
+   <font color="blue"> <H2>TRADING PART</H2></font>
 	<form method="POST" action="/admin_control/">
 	{% csrf_token %}
 	CURRENT STATUS : 
+    <font color="red">
     {%if trade_enable%}
-    <B>TRADE ENABLED</B>
+    <h3>TRADE ENABLED</h3>
     {%else%}
-    <B>TRADE DISABLED</B>
+    <h3>TRADE DISABLED</h3>
     {%endif%}
-    <br>
+    
+    </font>
 
     <label>CHANGE STATUS:</label>
     		<select name ="status">
@@ -42,15 +46,21 @@
     		</select>
     <br>
     <input type="submit" name="submit" value="CHANGE STATUS" />
-    <BR>
+ 
     <br>
-    <H2>SETPRICE PART</H2>
+    <font color="blue"><H2>SETPRICE[DURING ROUND]</H2></font>
 	<form method="POST" action="/admin_control/">
 	{% csrf_token %}
 	NOTE: make sure trading in disabled
     <br>
-	<input type="submit" name="submit" value="SET PRICE" /> 
-
+	<input type="submit" name="submit" value="SET PRICE[DURING ROUND]" /> 
+    <br>
+    <font color="blue"><H2>SETPRICE[AFTER ROUND]</H2></font>
+    <form method="POST" action="/admin_control/">
+    {% csrf_token %}
+    NOTE: make sure trading in disabled
+    <br>
+    <input type="submit" name="submit" value="SET PRICE[AFTER ROUND]" /> 
 </center>
 
 

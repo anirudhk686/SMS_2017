@@ -8,270 +8,348 @@ from django.views.decorators.csrf import csrf_exempt
 
 
 
-
-
+ 
 
 @csrf_exempt
 def bitsRegistrationView(request): #Registration for first degree bitsians
-	if request.method == 'POST':
-		team = Team()
-		
-		id1 = request.POST['id1']
-		team.id1 = str(id1)
-		team.id2 = str(request.POST['id2'])
-		team.password=randint(101,999)
-		team.team_no = id1
+	try:
+		if request.method == 'POST':
+			team = Team()
+			
+			id1 = request.POST['id1']
+			team.id1 = str(id1)
+			team.id2 = str(request.POST['id2'])
+			team.password=randint(101,999)
+			team.team_no = id1
 
-		#check if the teamno is already registered
-		try:
-			t = Team.objects.get(team_no=team.team_no)
-			return HttpResponse("Team Number Already Registered")
-		except Team.DoesNotExist:
-			team.save()
+			#check if the teamno is already registered
+			try:
+				t = Team.objects.get(team_no=team.team_no)
+				return HttpResponse("Team Number Already Registered")
+			except Team.DoesNotExist:
+				admin_object = Admin_control.objects.all()[0]
+				admin_object.total_teams = admin_object.total_teams+1
+				admin_object.save()
+				team.save()
 
-			#-------EDIT ADD JS ----------
-			team_dict = {'team_no':team.team_no,'password':team.password}
-		return JsonResponse(team_dict)
-		
-	else:
-		
-		return render_to_response('main/bitsregister1.html',)
+				#-------EDIT ADD JS ----------
+				team_dict = {'team_no':team.team_no,'password':team.password}
+			return JsonResponse(team_dict)
+			
+		else:
+			
+			return render_to_response('main/bitsregister1.html',)
+	except Exception as e:
+		return HttpResponse(e)
 
 @csrf_exempt
 def otherRegistrationView(request): #Registration for the rest
+	try:
+		if request.method == 'POST':
 
-	if request.method == 'POST':
+			team = Team()
+			
 
-		team = Team()
-		
+			team.id1 = request.POST['id1']
+			team.id2 = request.POST['id2']
+			team.password=randint(101,999)
+			team.mobile_no = request.POST['contact']
 
-		team.id1 = request.POST['id1']
-		team.id2 = request.POST['id2']
-		team.password=randint(101,999)
-		team.mobile_no = request.POST['contact']
+			#since outstees id may not be in 15474 pattern we assign them team nos starting form 20001
+			#we increment the update the model once that number is assigned
 
-		#since outstees id may not be in 15474 pattern we assign them team nos starting form 20001
-		#we increment the update the model once that number is assigned
+			otherteamno = Admin_control.objects.all()[0]
+			team.team_no = otherteamno.Other_teamno
 
-		otherteamno = Admin_control.objects.all()[0]
-		team.team_no = otherteamno.Other_teamno
+			team.save()
 
-		team.save()
-		# increment teamno for next team
-		otherteamno.Other_teamno += 1
-		otherteamno.save()
+			admin_object = Admin_control.objects.all()[0]
+			admin_object.total_teams = admin_object.total_teams+1
+			admin_object.save()
+			# increment teamno for next team
+			otherteamno.Other_teamno += 1
+			otherteamno.save()
 
-		#-------EDIT ADD JS ----------
-		team_dict = {'team_no':team.team_no,'password':team.password,'page':1}
-		return JsonResponse(team_dict)
+			#-------EDIT ADD JS ----------
+			team_dict = {'team_no':team.team_no,'password':team.password,'page':1}
+			return JsonResponse(team_dict)
 
-		
-	else:
-		return render_to_response('main/otherregister.html',)	
+			
+		else:
+			return render_to_response('main/otherregister.html',)	
+	except Exception as e:
+		return HttpResponse(e)
 
 @csrf_exempt
 def trade(request):
-	admin_object = Admin_control.objects.all()[0]#	getting the round_no which entered by us in admin_view
-	roundno = admin_object.round_no
-	stockinfo = StockInfo.objects.filter(round_no=roundno) 	#	getting all stock
+	try:
+		admin_object = Admin_control.objects.all()[0]#	getting the round_no which entered by us in admin_view
+		roundno = admin_object.round_no
+		stockinfo = StockInfo.objects.filter(round_no=roundno) 	#	getting all stock
 	
-	if request.method == 'POST':			
-		
-		tradeEnable = admin_object.trade_enable
-
-
-		if (tradeEnable==False): 		# false indicates trasition period for us to determine the stock prices - so no trading
-			return HttpResponse("sorry,Cannot trade now")
-
-		else:
+		if request.method == 'POST':			
 			
-			teamno = int(request.POST['teamno'])
-			password = int(request.POST['password'])
-			
-			#---- ADD EXCEPTION HANDLING HERE-----
-			team = Team.objects.get(team_no=teamno)
-			#authenticate
-			if (team.password==password):
-
-				action = int(request.POST['action'])
-				stock_name = request.POST['stock']
-				no_of_stock = int(request.POST['number'])
-				
-				# check if trader has enough stocks of that kind to sell
-
-				if (action == 0): # if sell is not the call no need to calculate number of stocks left
-					try:
-						sl = StockLeft.objects.get(team_no=teamno,stockname=stock_name)
-						stock_left = sl.left
-					except StockLeft.DoesNotExist:
-						sl = None
-					
-					if sl == None:
-						stock_left=0
-				
-				#check if team has enough stocks to sell
-				if ((action == 0)and(stock_left < no_of_stock )):	
-					return HttpResponse("not enough stocks to sell")
-
-				#check if team has enough money to buy
-				si = [e for e in stockinfo if e.name == stock_name]
-				si = si[0]
-				sprice = si.pricefinal
-
-				if((action == 1)and(team.money<(sprice*no_of_stock))):
-					return HttpResponse("not enough money")
-
-				else:
-					# store trade details in Trade model
-					
-					tradelog =  Tradebook()
-					tradelog.team = team
-					tradelog.stockname = stock_name
-					if action==1:
-						tradelog.call= True		#True = Buy and False = Sell
-					else:
-						tradelog.call= False
-					tradelog.num =  no_of_stock
-					tradelog.round_no = roundno
-					tradelog.save()
-
-					'''
-					update the StockLeft model.
-					if there is an existing entry for that stock and team - update the number of stock left
-					else create an entry for that stock and team
-					'''
-					if action == 1:
-						try:
-							sl = StockLeft.objects.get(team_no=teamno,stockname=stock_name)
-						except StockLeft.DoesNotExist:
-							sl = None
-					# if action == 0 , sl was already determined above
-					# this division of one upand one done has been done to prevent fetching of the object 2 times in StockLeft database
-
-					if sl == None:
-						sl = StockLeft()
-						sl.team_no=teamno
-						sl.stockname = stock_name
-						sl.left = no_of_stock # as first a stock must be bought before it is sold
-					else:
-						#update sl.left depending upon buy/sell
-						if action==1: # stock bought
-							sl.left = sl.left + no_of_stock
-						else:
-							sl.left = sl.left - no_of_stock
-
-					sl.save()
-
-					
-					'''
-					update StockInfo model : field - number of stock left
-					'''
-					
-					if action==1: # stock bought
-						si.left = si.left + no_of_stock
-					else:
-						si.left = si.left - no_of_stock
-
-					si.save()
+			tradeEnable = admin_object.trade_enable
 
 
-
-					'''
-					now affect changes in trader's account
-					get price of that stock from StockPrice model
-					'''
-
-					
-
-					if action == 1: #buy - so subtract money from trader's account
-						team.money = team.money - (sprice*no_of_stock)
-					else:			# sell - add money to traders account
-						team.money = team.money + (sprice*no_of_stock)
-
-					team.save()
-
-					return JsonResponse({'money':team.money})
-					
+			if (tradeEnable==False): 		# false indicates trasition period for us to determine the stock prices - so no trading
+				return HttpResponse("sorry,Cannot trade now")
 
 			else:
-				return HttpResponse("Invalid teamno/password")
+				
+				teamno = int(request.POST['teamno'])
+				password = int(request.POST['password'])
+				
+				#---- ADD EXCEPTION HANDLING HERE-----
+				team = Team.objects.get(team_no=teamno)
+				#authenticate
+				if (team.password==password):
 
-	else:		
+					action = int(request.POST['action'])
+					stock_name = request.POST['stock']
+					no_of_stock = int(request.POST['number'])
+					
+					# check if trader has enough stocks of that kind to sell
 
-		return render_to_response('main/trade.html',{'stocklist':stockinfo})
+					if (action == 0): # if sell is not the call no need to calculate number of stocks left
+						try:
+							sl = StockLeft.objects.get(team_no=teamno,stockname=stock_name)
+							stock_left = sl.left
+						except StockLeft.DoesNotExist:
+							sl = None
+						
+						if sl == None:
+							stock_left=0
+					
+					#check if team has enough stocks to sell
+					if ((action == 0)and(stock_left < no_of_stock )):	
+						return HttpResponse("not enough stocks to sell")
 
+					#check if team has enough money to buy
+					si = [e for e in stockinfo if e.name == stock_name]
+					si = si[0]
+					sprice = si.pricefinal
+
+					if((action == 1)and(team.money<(sprice*no_of_stock))):
+						return HttpResponse("not enough money")
+
+					else:
+						# store trade details in Trade model
+						
+						tradelog =  Tradebook()
+						tradelog.team = team
+						tradelog.stockname = stock_name
+						if action==1:
+							tradelog.call= True		#True = Buy and False = Sell
+						else:
+							tradelog.call= False
+						tradelog.num =  no_of_stock
+						tradelog.round_no = roundno
+						tradelog.save()
+
+						'''
+						update the StockLeft model.
+						if there is an existing entry for that stock and team - update the number of stock left
+						else create an entry for that stock and team
+						'''
+						if action == 1:
+							try:
+								sl = StockLeft.objects.get(team_no=teamno,stockname=stock_name)
+							except StockLeft.DoesNotExist:
+								sl = None
+						# if action == 0 , sl was already determined above
+						# this division of one upand one done has been done to prevent fetching of the object 2 times in StockLeft database
+
+						if sl == None:
+							sl = StockLeft()
+							sl.team_no=teamno
+							sl.stockname = stock_name
+							sl.left = no_of_stock # as first a stock must be bought before it is sold
+						else:
+							#update sl.left depending upon buy/sell
+							if action==1: # stock bought
+								sl.left = sl.left + no_of_stock
+							else:
+								sl.left = sl.left - no_of_stock
+
+						sl.save()
+
+						
+						'''
+						update StockInfo model : field - number of stock left
+						'''
+						
+						if action==1: # stock bought
+							si.left = si.left + no_of_stock
+						else:
+							si.left = si.left - no_of_stock
+
+						si.save()
+
+
+
+						'''
+						now affect changes in trader's account
+						get price of that stock from StockPrice model
+						'''
+
+						
+						if action == 1: #buy - so subtract money from trader's account
+							team.money = team.money - (sprice*no_of_stock)
+						else:			# sell - add money to traders account
+							team.money = team.money + (sprice*no_of_stock)
+
+						team.save()
+
+						return JsonResponse({'money':team.money})
+						
+
+				else:
+					return HttpResponse("Invalid teamno/password")
+
+		else:		
+
+			return render_to_response('main/trade.html',{'stocklist':stockinfo})
+	except Exception as e:
+		return HttpResponse(e)
 
 @csrf_exempt
 def admin_control(request):
 	'''
-	---  IMPORTANT -----
-	while changing price after completion of round
-	follow this order
-	a) set trade_enable to false
-	b) then change round
-	c) then setprice
-	d) set trade_enable to true
+		---  IMPORTANT -----
+		while changing price after completion of round
+		follow this order
+		a) set trade_enable to false
+		b) then change round
+		c) then setprice
+		d) set trade_enable to true
 	'''
-	admin_object = Admin_control.objects.all()[0]
+	if(1==1):
+		admin_object = Admin_control.objects.all()[0]
 
-	if (request.user.is_superuser):
+		if (request.user.is_superuser):
 
-		if request.method == 'POST':
-			submit = request.POST['submit']
-			if (submit=='CHANGE ROUND'):
-				if admin_object.trade_enable == True:
-					return HttpResponse("disable trade before changing round")
-				else:
-					rnd = int(request.POST['round'])
-					admin_object.round_no = rnd
+			if request.method == 'POST':
+				submit = request.POST['submit']
+				if (submit=='CHANGE ROUND'):
+					if admin_object.trade_enable == True:
+						return HttpResponse("disable trade before changing round")
+					else:
+						rnd = int(request.POST['round'])
+						admin_object.round_no = rnd
+						admin_object.save()
+						return render_to_response('main/admin_control1.html',{'current_round':admin_object.round_no,'category':1})
+
+				elif (submit=='CHANGE STATUS'):
+					status= int(request.POST['status'])
+					if status==0:
+						admin_object.trade_enable = False
+					else:
+						admin_object.trade_enable = True
 					admin_object.save()
-					return render_to_response('main/admin_control1.html',{'current_round':admin_object.round_no,'category':1})
+					return render_to_response('main/admin_control1.html',{'status':admin_object.trade_enable,'category':2})
+				
+				elif (submit=='SET PRICE[DURING ROUND]'):
+					current_round = admin_object.round_no
+					if (admin_object.trade_enable == True):
+						return HttpResponse("first disable trade")
+					else:
+						setpriceDuringRound(current_round)
+						return render_to_response('main/admin_control1.html',{'round':(admin_object.round_no),'category':3})
 
-			elif (submit=='CHANGE STATUS'):
-				status= int(request.POST['status'])
-				if status==0:
-					admin_object.trade_enable = False
+
+
 				else:
-					admin_object.trade_enable = True
-				admin_object.save()
-				return render_to_response('main/admin_control1.html',{'status':admin_object.trade_enable,'category':2})
-			
-			else:
+					current_round = admin_object.round_no
+					if (admin_object.trade_enable == True):
+						return HttpResponse("first disable trade")
+					elif (current_round==1):
+						return HttpResponse("cannot set price for round 1")
+					else:
+						setpriceAfterRound(current_round)
+						return render_to_response('main/admin_control1.html',{'round':(admin_object.round_no),'category':3})
+
+
+			else :
+
 				current_round = admin_object.round_no
-				if (admin_object.trade_enable == True):
-					return HttpResponse("first disable trade")
-				elif (current_round==1):
-					return HttpResponse("cannot set price for round 1")
-				else:
-					setprice(current_round)
-					return render_to_response('main/admin_control1.html',{'round':(admin_object.round_no),'category':3})
+				trade_enable = admin_object.trade_enable
 
+				return render_to_response('main/admin_control.html',{'current_round':current_round,'trade_enable':trade_enable})
 
-		else :
-
-			current_round = admin_object.round_no
-			trade_enable = admin_object.trade_enable
-
-			return render_to_response('main/admin_control.html',{'current_round':current_round,'trade_enable':trade_enable})
-
-	else:
-		return HttpResponse("admin login required to veiw this page")
-
-
+		else:
+			return HttpResponse("admin login required to veiw this page")
+	
 @csrf_exempt
-def setprice(roundno):
+def setpriceAfterRound(roundno):
 	# determine prices using left field in StockInfo model
 	# save the new prices to its pricefinal field 
-
+	admin_object = Admin_control.objects.all()[0]
+	n = admin_object.total_teams # total number of teams
+	start_money = admin_object.starting_money
 	stockinfo = StockInfo.objects.filter(round_no=roundno)
+	stockinfo_pre = StockInfo.objects.filter(round_no=(roundno-1))# objects of previous round
+
 	for s in stockinfo :
-			# -------EDIT HERE-------
-			# Exact formulae to update
-			# USE s.left 
-		s.pricefinal = s.priceinitial + 100
+		sp=[e for e in stockinfo_pre if e.name == s.name]
+		left = sp[0].left # total (buy - sell) of a stock for previous round
+
+		increment = ((left * sp[0].pricefinal*sp[0].pricefinal)/n)*(0.3/start_money)
+
+		s.pricefinal = s.priceinitial + increment
+		s.priceinitial = s.pricefinal
 		s.save()
+
+	#recalculate net worth of each team
+	teams = Team.objects.all()
+	for t in teams:
+		nw = 0 
+		portfolio = StockLeft.objects.filter(team_no = t.team_no)
+
+		for p in portfolio:
+			if(p.left!=0):
+				price_temp = [e for e in stockinfo if e.name == p.stockname]
+				price = price_temp[0].pricefinal
+				nw = nw + (p.left * price)
+
+
+		t.net_worth = t.money + nw
+		t.save()
+
 	return
+
+
+def setpriceDuringRound(roundno):
+	admin_object = Admin_control.objects.all()[0]
+	n = admin_object.total_teams # total number of teams
+	start_money = admin_object.starting_money
+	stockinfo = StockInfo.objects.filter(round_no=roundno)
+
+	for s in stockinfo :
+		left = s.left # total (buy - sell) of a stock for that round
+
+		increment = ((left * s.pricefinal*s.pricefinal)/n)*(1.0/start_money)
+
+		s.pricefinal = s.priceinitial + increment
+		s.save()
+
+	#recalculate net worth of each team
+	teams = Team.objects.all()
+	for t in teams:
+		nw = 0 
+		portfolio = StockLeft.objects.filter(team_no = t.team_no)
+
+		for p in portfolio:
+			if(p.left!=0):
+				price_temp = [e for e in stockinfo if e.name == p.stockname]
+				price = price_temp[0].pricefinal
+				nw = nw + (p.left * price)
+
+
+		t.net_worth = t.money + nw
+		t.save()
 	
+	return
 
 @csrf_exempt
 def stockList(request):
@@ -291,33 +369,17 @@ def stockList(request):
 
 @csrf_exempt
 def teamRanks(request):
-	players=Team.objects.all().order_by('money')
+	players=Team.objects.all().order_by('-net_worth')# -ve sign for decending order
 	p=[]
 	k=1
 	for i in players:
-		p.append([i.team_no,i.money])
+		p.append([i.team_no,i.net_worth])
 		k+=1
 		if k==11:
 			break
 	return JsonResponse(p, safe=False)
 
-@csrf_exempt
-def Transactions(request):
-	trades=Tradebook.objects.all()
-	p=[]
-	k=1
 
-	for i in trades:
-		if i.call==True:
-			l="Buy"
-		else:
-			l="Sell"
-
-		p.append([i.team.team_no,i.stockname,l,i.num])
-		k+=1
-		if k==11:
-			break
-	return JsonResponse(p, safe=False)
 
 def Dashboard(request):
 	return render_to_response('main/dashboard.html',{})
