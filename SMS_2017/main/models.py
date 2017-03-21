@@ -1,7 +1,6 @@
 from __future__ import unicode_literals
 from django.db import models
 
-
 start_money=50000 #-----EDIT HERE ---------<complete> decide
 
 class Team(models.Model):
@@ -33,7 +32,7 @@ class StockInfo(models.Model):
 	left = models.IntegerField(default=0) # bought - add, sell - subtract
 	priceinitial=models.FloatField() #prices set by efa
 	pricefinal=models.FloatField(default=0) # to be determined after each round
-											# for first round priceinitial = pricefinal
+										# for first round priceinitial = pricefinal
 
 	class Meta:
 		unique_together=('name','round_no')
