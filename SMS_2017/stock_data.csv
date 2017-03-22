@@ -1,0 +1,32 @@
+NAME OF COMPANY,,,TICKER ,,,AFFECTED SECTOR,,OPENING PRICE,ROUND 1,ROUND 2,ROUND 3,CLOSING PRICE,VOLUME,%,,,
+,,,,,,,,,,,,,,,,,
+Ashok Leyland Ltd.,,,ASHOKLEY,,,AUTOMOBILE,,89.45,89.45,90.15,90.15,90.15,,0.78,0.69771,,90.15
+Cairn India Ltd.,,,CAIRN,,,OIL,,242.4,238.35,238.35,238.35,238.35,,-1.67,-4.04808,,238.35
+Cyient Ltd.,,,CYIENT,,,IT,,459.55,461.2,461.2,461.2,461.2,,0.36,1.65438,,461.2
+Oberoi Realty Ltd.,,,OBEROIRLTY,,,REALTY,,342.65,342.65,342.65,346.55,346.56,,1.14,3.90621,,346.55
+Revlon Inc.,,,REV (NYSE),,,FMCG,,2429.3,2429.3,2429.3,2410.85,2410.84,,-0.76,-18.46268,,2410.85
+Hindustan Unilever Ltd.,,,HINDUNILVR,,,FMCG,,837.65,837.65,837.65,829.8,829.78,,-0.94,-7.87391,,829.8
+United Spirits Ltd.,,,MCDOWELL,,,BEVERAGES,,2016.6,2016.6,1975.25,1975.25,1975.26,,-2.05,-41.3403,,1975.25
+United Breweries Ltd.,,,UBL,,,BEVERAGES,,892.05,892.05,879.4,879.4,879.38,,-1.42,-12.66711,,879.4
+Orient Cement Ltd.,,,ORIENTCEM,,,CEMENT,,162.35,162.35,162.35,152.25,152.25,,-6.22,-10.09817,,152.25
+Jaiprakash Associates Ltd.,,,JPASSOCIAT,,,CEMENT,,11.2,11.2,11.2,11.25,11.25,,0.45,0.0504,,11.25
+Sun Pharmaceutical Industries Ltd.,,,SUNPHARMA,,,PHARMA,,654.9,650.75,650.75,650.75,650.77,,-0.63,-4.12587,,650.75
+Hindustan Zinc Ltd.,,,HINDZINC,,,METALS & MINING,,252.3,252.3,256.25,256.25,256.24,,1.56,3.93588,,256.25
+UltraTech Cement Ltd.,,,ULTRACEMCO,,,CEMENT,,3798.1,3825.85,3825.85,3825.85,3825.83,,0.73,27.72613,,3825.85
+Zensar Technologies Ltd.,,,ZENSARTECH,,,IT,,952.25,934.35,934.35,934.35,934.35,,-1.88,-17.9023,,934.35
+Tata Consultancy Services Ltd.,,,TCS,,,,,2185.8,2185.8,2138.35,2138.35,2138.37,,-2.17,-47.43186,,2138.35
+Mastek Ltd.,,,MASTEK,,,,,139.5,139.5,159.1,159.1,159.09,,14.04,19.5858,,159.1
+Lakshmi Vilas Bank Ltd.,,,LAKSHVILAS,,,,,155.05,155.05,155.05,153.4,153.38,,-1.08,-1.67454,,153.4
+Havells India Ltd.,,,HAVELLS,,,,,377,377,377,383.7,383.71,,1.78,6.7106,,383.7
+,,,,,,,,,,,,,,,,,
+,,,,,,,,,,,,,,,,,
+,,,,,,,,,,,,,,,,,
+,,,,,,,,,,,,,,,,,
+,,,,,,,,,,,,,,,,,
+,,,,,,,,,,,,,,,,,
+,,,,,,,,,,,,,,,,,
+,,,,,,,,,,,,,,,,,
+,,,,,,,,,,,,,,,,,
+ROUND 1,,,"Cairn India, Cyient, SunPharma, Ultratech, Zensar",,,,,,,,,,,,,,
+ROUND 2,,,"Ashok Leyland, McDowell-UBL, HindZinc, TCS, Mastek",,,,,,,,,,,,,,
+ROUND 3,,,"Oberoi, Revlon-HUL,Orient-JP, Lakshmi Vilas, Havells",,,,,,,,,,,,,,
