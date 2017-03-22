@@ -302,9 +302,10 @@ def setpriceAfterRound(roundno):
 
 	#recalculate net worth of each team
 	teams = Team.objects.all()
+	stockleft = StockLeft.objects.all()
 	for t in teams:
 		nw = 0 
-		portfolio = StockLeft.objects.filter(team_no = t.team_no)
+		portfolio = [e for e in stockleft if e.team_no == t.team_no]		
 
 		for p in portfolio:
 			if(p.left!=0):
@@ -351,6 +352,28 @@ def setpriceDuringRound(roundno):
 	
 	return
 
+def team_details(request):
+	try:
+		if (request.user.is_superuser):
+			if request.method == 'POST':
+				teamno = int(request.POST['teamno'])
+				team = Team.objects.get(team_no=teamno)
+				password = team.password
+				money = team.money
+				stockleft = StockLeft.objects.filter(team_no=team.team_no)
+
+
+
+				f = {"password":password,"money":money}
+				return JsonResponse(f)
+			else:
+				return render_to_response('main/team_details.html',)
+		else:
+			return HttpResponse("sorry you cannot veiw this page ")
+
+	except Exception as e:
+		return HttpResponse(e)
+
 @csrf_exempt
 def stockList(request):
 	admin_control=Admin_control.objects.all()
@@ -359,7 +382,7 @@ def stockList(request):
 	p=[]
 	k=1
 	for i in stocks:
-		p.append([i.name,i.pricefinal,(i.pricefinal-i.priceinitial)])
+		p.append([i.name,(i.pricefinal)/(i.exchange_rate),(i.pricefinal-i.priceinitial),i.stocktype])
 		k+=1
 		if k==10:
 			break
@@ -383,6 +406,14 @@ def teamRanks(request):
 
 def Dashboard(request):
 	return render_to_response('main/dashboard.html',{})
+
+def exchange(request):
+	roundno=admin_control[0].round_no
+	r = Exchange_rate.objects.filter(round_no=roundno)
+	rate = r.exchange_rate
+	return JsonResponse(rate, safe=False)
+
+
 
 		
 

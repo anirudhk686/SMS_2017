@@ -1,7 +1,8 @@
 from __future__ import unicode_literals
 from django.db import models
 
-start_money=50000 #-----EDIT HERE ---------<complete> decide
+start_money = 50000
+ #-----EDIT HERE ---------<complete> decide
 
 class Team(models.Model):
 	team_no = models.IntegerField(primary_key=True) #For bitsians first degree it will be last 5 digits of first idno
@@ -32,7 +33,10 @@ class StockInfo(models.Model):
 	left = models.IntegerField(default=0) # bought - add, sell - subtract
 	priceinitial=models.FloatField() #prices set by efa
 	pricefinal=models.FloatField(default=0) # to be determined after each round
-										# for first round priceinitial = pricefinal
+											# for first round priceinitial = pricefinal
+	stocktype = models.BooleanField(default=True) #  True - BSE
+												  #  False - nosdac
+	exchange_rate=models.FloatField(default=1)
 
 	class Meta:
 		unique_together=('name','round_no')
@@ -56,7 +60,7 @@ class Admin_control(models.Model):
 	# this will be used to assign team no to outstees during registration
 	# this is used in otherRegistrationView
 	total_teams = models.IntegerField(default=0)
-	starting_money = start_money
+	starting_money = models.IntegerField(default=0)
 
 	def __unicode__(self):
 		return "Admin_control"	
@@ -87,4 +91,20 @@ class StockLeft(models.Model):
 
 	def __unicode__(self):
 		return self.stockname + '-team-'+str(self.team_no)
+
+class Exchange_rate(models.Model):
+	'''
+	this model stores the exchange rate for each round
+	'''
+	round_no = models.SmallIntegerField(default=0)
+	exchange_rate=models.FloatField(default=1)
+
+	class Meta:
+		unique_together=('round_no','exchange_rate')
+
+	def __unicode__(self):
+		return 'round - '+str(self.round_no)+'-exchange_rate - '+str(self.exchange_rate)
+
+
+
 

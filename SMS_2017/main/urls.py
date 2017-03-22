@@ -9,4 +9,6 @@ urlpatterns = [
     url(r'^ranks/',views.teamRanks),
     url(r'admin_control',views.admin_control),
     url(r'^$',views.Dashboard),
+    url(r'^exchange/',views.exchange),
+    url(r'^team_details/',views.team_details),
 ]

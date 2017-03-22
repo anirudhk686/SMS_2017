@@ -1,0 +1,27 @@
+<html>
+<head>
+  <title>team details</title>
+</head>
+<body>
+
+<h3><center> ENTER TEAMNO</center></h3>
+
+<center>
+  <form method="POST" action="/team_details/">
+    {% csrf_token %}
+    
+    <br>
+    <label>Team Number:</label>
+      <input type="number" name="teamno"  min="10000" max="99999" required/>
+    <input type="submit" name="submit" value="get details" /> 
+
+
+
+  </center>
+
+
+
+
+</form>
+</body>
+</html>
