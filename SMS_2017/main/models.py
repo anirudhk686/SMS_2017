@@ -1,8 +1,8 @@
 from __future__ import unicode_literals
 from django.db import models
 
-start_money = 50000
- #-----EDIT HERE ---------<complete> decide
+start_money = 100000
+
 
 class Team(models.Model):
 	team_no = models.IntegerField(primary_key=True) #For bitsians first degree it will be last 5 digits of first idno
@@ -17,16 +17,20 @@ class Team(models.Model):
 											# for bitsians it will be 0
 	money = models.IntegerField(default=start_money)
 
-	net_worth = models.IntegerField(default = start_money)
+	net_worth = models.IntegerField(default = start_money) # money + their portfolio 
 
 	def __unicode__(self):
 		return str(self.team_no)
+
+class ID(models.Model):
+	# this model stores all the id's registered. this used to prevent same id's registration in multiple teams
+	idno=models.IntegerField(primary_key=True)  
 
 
 class StockInfo(models.Model):
 	#This stores a list of all stocks that are going to be displayed
 	#also stores number of stokes bought/sold in each round
-	# -----NOTE - CREAETE NAME*ROUND INSTANCES USING THE SCRIPT initial.py-----------
+	# -----NOTE - CREAETE NAME*ROUND INSTANCES USING THE SCRIPT initialscript.py-----------
 	
 	name=models.CharField(max_length=50)
 	round_no = models.SmallIntegerField(default=0)
@@ -35,8 +39,10 @@ class StockInfo(models.Model):
 	pricefinal=models.FloatField(default=0) # to be determined after each round
 											# for first round priceinitial = pricefinal
 	stocktype = models.BooleanField(default=True) #  True - BSE
-												  #  False - nosdac
-	exchange_rate=models.FloatField(default=1)
+												  #  False - nasdac
+	
+	exchange_rate=models.FloatField(default=1) # 1 - if the stock is BSE else value provided by EFA
+
 
 	class Meta:
 		unique_together=('name','round_no')
@@ -46,7 +52,8 @@ class StockInfo(models.Model):
 
 
 class Admin_control(models.Model):
-	# only one instance to this model to be created in admin
+	# only one instance to this model 
+	# its object creation and initialization in initialscript.py 
 	# we change these in admin_control view - whose template will only be displayed when admin in logged in
 
 	round_no = models.SmallIntegerField(default=0)		
@@ -59,7 +66,8 @@ class Admin_control(models.Model):
 	Other_teamno = models.IntegerField()
 	# this will be used to assign team no to outstees during registration
 	# this is used in otherRegistrationView
-	total_teams = models.IntegerField(default=0)
+	total_teams = models.IntegerField(default=0) # keep a count of total number of teams registered
+
 	starting_money = models.IntegerField(default=0)
 
 	def __unicode__(self):
@@ -68,6 +76,7 @@ class Admin_control(models.Model):
 														
 
 class Tradebook(models.Model):
+	# stores details of each trade
 	team=models.ForeignKey('Team')
 	stockname =models.CharField(max_length=50)
 	call=models.BooleanField() #True = Buy and False = Sell

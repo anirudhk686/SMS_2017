@@ -8,33 +8,48 @@ from django.views.decorators.csrf import csrf_exempt
 
 
 
- 
-
 @csrf_exempt
 def bitsRegistrationView(request): #Registration for first degree bitsians
 	try:
 		if request.method == 'POST':
 			team = Team()
-			
-			id1 = request.POST['id1']
+			id1=request.POST['id1']
+			id2=request.POST['id2']
 			team.id1 = str(id1)
-			team.id2 = str(request.POST['id2'])
+			team.id2 = str(id2)
+			if(id2==''):
+				id2=0
 			team.password=randint(101,999)
 			team.team_no = id1
-
-			#check if the teamno is already registered
+		
 			try:
-				t = Team.objects.get(team_no=team.team_no)
+				idnos1 = ID.objects.get(idno=id1)
 				return HttpResponse("Team Number Already Registered")
-			except Team.DoesNotExist:
-				admin_object = Admin_control.objects.all()[0]
-				admin_object.total_teams = admin_object.total_teams+1
-				admin_object.save()
-				team.save()
+			except ID.DoesNotExist:
+				try:
+					idnos2 = ID.objects.get(idno=id2)
+					return HttpResponse("Team Number Already Registered")
+				except ID.DoesNotExist:
 
-				#-------EDIT ADD JS ----------
-				team_dict = {'team_no':team.team_no,'password':team.password}
-			return JsonResponse(team_dict)
+					admin_object = Admin_control.objects.all()[0]
+					admin_object.total_teams = admin_object.total_teams+1
+					admin_object.save()
+
+					team.save()
+					if (id2==0):
+						idnos = ID()
+						idnos.idno = id1
+						idnos.save()
+					else:
+						idnos11 = ID()
+						idnos11.idno = id1
+						idnos11.save()
+						idnos22 = ID()
+						idnos22.idno = id2
+						idnos22.save()
+
+					team_dict = {'team_no':team.team_no,'password':team.password}
+					return JsonResponse(team_dict)
 			
 		else:
 			
@@ -83,9 +98,10 @@ def otherRegistrationView(request): #Registration for the rest
 @csrf_exempt
 def trade(request):
 	try:
-		admin_object = Admin_control.objects.all()[0]#	getting the round_no which entered by us in admin_view
+		admin_object = Admin_control.objects.all()[0]#	getting the round_no which entered by us in admin_control view
 		roundno = admin_object.round_no
 		stockinfo = StockInfo.objects.filter(round_no=roundno) 	#	getting all stock
+		start_mon = admin_object.starting_money
 	
 		if request.method == 'POST':			
 			
@@ -100,7 +116,6 @@ def trade(request):
 				teamno = int(request.POST['teamno'])
 				password = int(request.POST['password'])
 				
-				#---- ADD EXCEPTION HANDLING HERE-----
 				team = Team.objects.get(team_no=teamno)
 				#authenticate
 				if (team.password==password):
@@ -108,6 +123,10 @@ def trade(request):
 					action = int(request.POST['action'])
 					stock_name = request.POST['stock']
 					no_of_stock = int(request.POST['number'])
+
+					si = [e for e in stockinfo if e.name == stock_name]
+					si = si[0]
+					sprice = si.pricefinal
 					
 					# check if trader has enough stocks of that kind to sell
 
@@ -120,17 +139,16 @@ def trade(request):
 						
 						if sl == None:
 							stock_left=0
+
 					
 					#check if team has enough stocks to sell
-					if ((action == 0)and(stock_left < no_of_stock )):	
+					if ((action == 0)and((stock_left) < no_of_stock )):	
 						return HttpResponse("not enough stocks to sell")
 
 					#check if team has enough money to buy
-					si = [e for e in stockinfo if e.name == stock_name]
-					si = si[0]
-					sprice = si.pricefinal
+					
 
-					if((action == 1)and(team.money<(sprice*no_of_stock))):
+					if((action == 1)and((team.money+BUFFERMONEY)<(sprice*no_of_stock))):
 						return HttpResponse("not enough money")
 
 					else:
@@ -249,15 +267,7 @@ def admin_control(request):
 					admin_object.save()
 					return render_to_response('main/admin_control1.html',{'status':admin_object.trade_enable,'category':2})
 				
-				elif (submit=='SET PRICE[DURING ROUND]'):
-					current_round = admin_object.round_no
-					if (admin_object.trade_enable == True):
-						return HttpResponse("first disable trade")
-					else:
-						setpriceDuringRound(current_round)
-						return render_to_response('main/admin_control1.html',{'round':(admin_object.round_no),'category':3})
-
-
+				
 
 				else:
 					current_round = admin_object.round_no
@@ -297,7 +307,7 @@ def setpriceAfterRound(roundno):
 		increment = ((left * sp[0].pricefinal*sp[0].pricefinal)/n)*(0.3/start_money)
 
 		s.pricefinal = s.priceinitial + increment
-		s.priceinitial = s.pricefinal
+		s.priceinitial = sp[0].pricefinal
 		s.save()
 
 	#recalculate net worth of each team
@@ -320,39 +330,9 @@ def setpriceAfterRound(roundno):
 	return
 
 
-def setpriceDuringRound(roundno):
-	admin_object = Admin_control.objects.all()[0]
-	n = admin_object.total_teams # total number of teams
-	start_money = admin_object.starting_money
-	stockinfo = StockInfo.objects.filter(round_no=roundno)
-
-	for s in stockinfo :
-		left = s.left # total (buy - sell) of a stock for that round
-
-		increment = ((left * s.pricefinal*s.pricefinal)/n)*(1.0/start_money)
-
-		s.pricefinal = s.priceinitial + increment
-		s.save()
-
-	#recalculate net worth of each team
-	teams = Team.objects.all()
-	for t in teams:
-		nw = 0 
-		portfolio = StockLeft.objects.filter(team_no = t.team_no)
-
-		for p in portfolio:
-			if(p.left!=0):
-				price_temp = [e for e in stockinfo if e.name == p.stockname]
-				price = price_temp[0].pricefinal
-				nw = nw + (p.left * price)
-
-
-		t.net_worth = t.money + nw
-		t.save()
-	
-	return
 
 def team_details(request):
+	# this view is to tell password of a team if they have forgotten it 
 	try:
 		if (request.user.is_superuser):
 			if request.method == 'POST':
@@ -374,6 +354,11 @@ def team_details(request):
 	except Exception as e:
 		return HttpResponse(e)
 
+'''
+	the following veiws are to rendet data to the frontend (live screen) where stockprices, team ranks , round exchange_rate is displayed to players
+
+'''
+
 @csrf_exempt
 def stockList(request):
 	admin_control=Admin_control.objects.all()
@@ -384,7 +369,7 @@ def stockList(request):
 	for i in stocks:
 		p.append([i.name,(i.pricefinal)/(i.exchange_rate),(i.pricefinal-i.priceinitial),i.stocktype])
 		k+=1
-		if k==10:
+		if k==11:
 			break
 
 	return JsonResponse(p, safe=False)
@@ -408,9 +393,10 @@ def Dashboard(request):
 	return render_to_response('main/dashboard.html',{})
 
 def exchange(request):
+	admin_control=Admin_control.objects.all()
 	roundno=admin_control[0].round_no
 	r = Exchange_rate.objects.filter(round_no=roundno)
-	rate = r.exchange_rate
+	rate = r[0].exchange_rate
 	return JsonResponse(rate, safe=False)
 
 

@@ -9,4 +9,5 @@ admin.site.register(StockInfo)
 admin.site.register(Tradebook)
 admin.site.register(StockLeft)
 admin.site.register(Exchange_rate)
+admin.site.register(ID)
 

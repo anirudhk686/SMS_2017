@@ -7,53 +7,57 @@ from main.models import StockInfo
 from main.models import Admin_control
 from main.models import Exchange_rate
 
-start_money=50000
+start_money=100000
 
 file = open(r'stock_data.csv', 'r')
 row = csv.reader(file)
 
 def populate1():
-    count = 0
-    for data in row:
-        count+=1
-        if count>11:
-        	break
-        elif count>1:
-        	
-            
-            for j in range (4):
-            	s = StockInfo()
-            	s.name=data[0]
-            	s.round_no=(1+j)
-            	s.left=0
-            	s.priceinitial=data[1+j]
-            	s.pricefinal=data[1+j]
-            	s.exchange_rate=data[5+j]
-            	if s.exchange_rate>1:
-            		s.stocktype=False
-            	else:
-            		s.stocktype=True
-            	s.save()
+	count = 0
+	for data in row:
+		count+=1
+		if count>11:
+			break
+		elif count>1:
+			
+			
+			for j in range (4):
+				s = StockInfo()
+				s.name=data[0]
+				s.round_no=(1+j)
+				s.left=0
+				s.priceinitial=float(data[1+j])
+				s.pricefinal=float(data[1+j])
+				s.exchange_rate=float(data[5+j])
+				
+				
+				if(s.exchange_rate>2):
+
+					s.stocktype=False
+					
+				else:
+					s.stocktype=True 
+				s.save()
 
 def populate2():
 
-    count = 0
-    file = open(r'stock_data.csv', 'r')
-    row = csv.reader(file)
-    for data in row:
-        
-        count+=1
-        if count>8:
+	count = 0
+	file = open(r'stock_data.csv', 'r')
+	row = csv.reader(file)
+	for data in row:
+		
+		count+=1
+		if count>8:
 
-            for j in range(4):
-                e = Exchange_rate()
-                e.round_no = (1+j)
-                e.exchange_rate = data[5+j]
-                e.save()           
-            break
-            
+			for j in range(4):
+				e = Exchange_rate()
+				e.round_no = (1+j)
+				e.exchange_rate = float(data[5+j])
+				e.save()           
+			break
+			
 
-        
+		
 
 
 def admin_reset():
@@ -64,10 +68,10 @@ def admin_reset():
 	a.total_teams = 0
 	a.starting_money = start_money
 	a.save()
-                
+				
 
 
 if __name__ == '__main__':
-    populate1()
-    populate2()
-    admin_reset()
+	populate1()
+	populate2()
+	admin_reset()

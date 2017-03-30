@@ -72,10 +72,10 @@ function changeColor(value)
   </div>
   <br>
 
-    <button type="submit" value="Trade" class="btn btn-default">Trade</button>
+    <button type="submit"  value="Trade" class="btn btn-default">Trade</button>
   </form>
 </div>
-
+  <button id="btnClr" value="Clear" style="margin-top: -3.7vw; margin-left:1000px;" class="btn btn-default" onclick="clear()">Clear</button>
 <div id="myModal" class="modal fade" role="dialog">
   <div class="modal-dialog">
 
@@ -95,6 +95,13 @@ function changeColor(value)
   </div>
 
 <script>
+  $("#btnClr").click(function clearAll(){
+    $('#teamno').val(" "); 
+      $('#password').val(" "); 
+      var sel=document.getElementById("stock");
+      sel.selectIndex=-1; 
+      $('#number').val(" ");  
+  });
 $('#form').submit(function(e){
   e.preventDefault();
   $.ajax({
@@ -103,7 +110,8 @@ $('#form').submit(function(e){
     dataType: "html",
     data: {teamno: $('#teamno').val(), password: $('#password').val(), stock: $('#stock option:selected').val(), number: $('#number').val(),action: $('input[name="action"]:checked').val() },
     success: function(response) {
-      console.log("request done...");    
+      console.log("request done..."); 
+      $('#number').val("");   
       $('#myModal').find('.modal-body').html(response);   
       $('#myModal').modal(); 
     },
@@ -114,7 +122,6 @@ $('#form').submit(function(e){
   });
 });
   </script>
-
 </body>
 </html>
 
